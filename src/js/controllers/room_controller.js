@@ -37,6 +37,10 @@ export default class extends Controller {
     }
   }
 
+  disconnect() {
+    if (this.janus != null) this.stop();
+  }
+
   start() {
     const controller = this;
 
