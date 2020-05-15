@@ -44,7 +44,7 @@ export default class extends Controller {
     if(window.location.protocol === 'http:')
       server = "http://" + window.location.hostname + ":8088/janus";
     else
-      server = "https://" + window.location.hostname + ":8089/janus";
+      server = "/janus";
 
     // Make sure the browser supports WebRTC
     if(!Janus.isWebrtcSupported()) {
@@ -161,8 +161,6 @@ export default class extends Controller {
   }
 
   stop() {
-    this.startTarget.disabled = false;
-    this.stopTarget.disabled = true;
     this.janus.destroy();
   }
 
