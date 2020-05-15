@@ -1,0 +1,28 @@
+@import "~bootstrap/scss/bootstrap";
+
+body.room {
+  height: 100%;
+  overflow: hidden;
+}
+
+main.room {
+  overflow: hidden;
+
+  .row.peers {
+    .col-3 {
+      height: 100%;
+    }
+
+    video {
+      width: auto    !important;
+      height: 100%   !important;
+    }
+  }
+
+  .row.main-stage {
+    video {
+      width: auto    !important;
+      height: 100%   !important;
+    }
+  }
+}
