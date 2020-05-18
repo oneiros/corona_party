@@ -3,7 +3,7 @@ import { Janus } from "janus-gateway"
 import videojs from "video.js"
 
 export default class extends Controller {
-  static targets = ["top", "bottom"];
+  static targets = ["top", "bottom", "mute"];
   janus
   screentest
   pin
@@ -144,7 +144,26 @@ export default class extends Controller {
           onlocalstream: function(stream) {
             Janus.debug(" ::: Got a local stream :::");
             Janus.debug(stream);
-            Janus.attachMediaStream(controller.createVideoTag(), stream);
+            const container = document.createElement("div");
+            container.classList.add("localvideo", "col-3");
+            const video = document.createElement("video");
+            video.autoplay = "autoplay";
+            video.muted = true;
+            container.appendChild(video);
+            const muteButton = document.createElement("button");
+            muteButton.classList.add("mute-button", "btn", "btn-sm", "btn-light");
+            const icon = document.createElement("i");
+            icon.classList.add("fas", "fa-volume-up");
+            icon.setAttribute("data-target", "room.mute");
+            muteButton.setAttribute("data-action", "click->room#toggleMuted");
+            muteButton.appendChild(icon);
+            container.appendChild(muteButton);
+            if (controller.bottomTarget.childNodes.length <= controller.topTarget.childNodes.length) {
+              controller.bottomTarget.appendChild(container);
+            } else {
+              controller.topTarget.appendChild(container);
+            }
+            Janus.attachMediaStream(video, stream);
           },
           onremotestream: function(stream) {
             // The publisher stream is sendonly, we don't expect anything here
@@ -304,6 +323,7 @@ export default class extends Controller {
   setupMainStage() {
     const controller = this;
     const video = document.getElementById('main-stage-video');
+    video.autoplay = true;
     this.janus.attach({
       plugin: "janus.plugin.streaming",
       opaqueId: this.opaqueId,
@@ -356,5 +376,24 @@ export default class extends Controller {
         Janus.attachMediaStream(video, stream);
       }
     });
+  }
+
+  toggleMuted() {
+    const muted = this.screentest.isAudioMuted();
+    Janus.log((muted ? "Unmuting" : "Muting") + " local stream...");
+    if (muted) {
+      this.screentest.unmuteAudio();
+      this.muteTarget.classList.remove("fa-volume-mute");
+      this.muteTarget.classList.add("fa-volume-up");
+      this.muteTarget.parentNode.classList.remove("btn-danger");
+      this.muteTarget.parentNode.classList.remove("btn-light");
+    } else {
+      this.screentest.muteAudio();
+      this.muteTarget.classList.remove("fa-volume-up");
+      this.muteTarget.classList.add("fa-volume-mute");
+      this.muteTarget.parentNode.classList.remove("btn-light");
+      this.muteTarget.parentNode.classList.add("btn-danger");
+      this.muteTarget.parentNode.classList.remove("btn-light");
+    }
   }
 }
